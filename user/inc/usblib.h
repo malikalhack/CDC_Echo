@@ -104,6 +104,19 @@
 #define CDC_IN_EP                       (0x82) /* EP1 for data IN */
 #define CDC_OUT_EP                      (0x02) /* EP1 for data OUT */
 
+#define LOG_LENGTH                      (50)
+#define LOG_DATA_LENGTH                 (10)
+#define LOG_OP_RESET                    (1)
+#define LOG_OP_GET_DESC_RX              (2)
+#define LOG_OP_GET_DESC_TX              (3)
+#define LOG_OP_GET_STATUS_TX            (4)
+#define LOG_OP_SET_ADDRESS_RX           (5)
+#define LOG_OP_GET_CLASS_DATA           (6)
+
+#define RXCNT(bsize, nblock) (uint16_t)(((bsize & 1) << 15) | ((nblock / 2 & 0x1F) << 10))
+#define LOBYTE(x)            ((uint8_t)(x & 0x00FF))
+#define HIBYTE(x)            ((uint8_t)((x & 0xFF00) >> 8))
+
 #define USB_DEVICE_CDC_REQUEST_SEND_ENCAPSULATED_COMMAND        (0x00) /*!< The CDC class request code for SEND_ENCAPSULATED_COMMAND. */
 #define USB_DEVICE_CDC_REQUEST_GET_ENCAPSULATED_RESPONSE        (0x01) /*!< The CDC class request code for GET_ENCAPSULATED_RESPONSE. */
 #define USB_DEVICE_CDC_REQUEST_SET_COMM_FEATURE                 (0x02) /*!< The CDC class request code for SET_COMM_FEATURE. */
@@ -140,39 +153,22 @@
 #define USB_DEVICE_CDC_REQUEST_GET_ATM_VC_STATISTICS            (0x53) /*!< The CDC class request code for GET_ATM_VC_STATISTICS. */
 #define USB_DEVICE_CDC_REQUEST_MDLM_SPECIFIC_REQUESTS_MASK      (0x7F) /*!< The CDC class request code for MDLM_SPECIFIC_REQUESTS_MASK. */
 
-#define RXCNT(bsize, nblock) (uint16_t)(((bsize & 1) << 15) | ((nblock / 2 & 0x1F) << 10))
-#define LOBYTE(x) ((uint8_t)(x & 0x00FF))
-#define HIBYTE(x) ((uint8_t)((x & 0xFF00) >> 8))
-
-#define LOG_LENGTH 50
-#define LOG_DATA_LENGTH 10
-#define LOG_OP_RESET 1
-#define LOG_OP_GET_DESC_RX 2
-#define LOG_OP_GET_DESC_TX 3
-#define LOG_OP_GET_STATUS_TX 4
-#define LOG_OP_SET_ADDRESS_RX 5
-#define LOG_OP_GET_CLASS_DATA 6
-
-#define _USB_STRING_(name, ws)                  \
-    \
-const struct name \
-{                          \
-        uint8_t  bLength;                       \
-        uint8_t  bDescriptorType;               \
-        uint16_t bString[(sizeof(ws) - 2) / 2]; \
-    \
-} \
+#define _USB_STRING_(name, ws)\
+\
+const struct name {\
+        uint8_t  bLength;\
+        uint8_t  bDescriptorType;\
+        uint16_t bString[(sizeof(ws) - 2) / 2];\
+}\
 name __attribute__((used, section("usb_string"))) = {sizeof(name), 0x03, ws};
 
-#define _USB_LANG_ID_(lng_id)     \
-    \
-const struct wLANGID \
-{         \
-        uint8_t  bLength;         \
-        uint8_t  bDescriptorType; \
-        uint16_t bString[1];      \
-    \
-} \
+#define _USB_LANG_ID_(lng_id)\
+\
+const struct wLANGID {\
+        uint8_t  bLength;\
+        uint8_t  bDescriptorType;\
+        uint16_t bString[1];\
+}\
 wLANGID __attribute__((used, section("usb_string"))) = {0x04, 0x03, lng_id};
 
 #pragma pack(push, 1)
@@ -235,30 +231,26 @@ typedef struct {
 
 } USBLIB_EPData;
 
-typedef struct
-{
+typedef struct {
     uint8_t Recipient : 5;
     uint8_t Type : 2;
     uint8_t Dir : 1;
 } USBLIB_RequestType;
 
-typedef struct
-{
+typedef struct {
     uint8_t L : 8;
     uint8_t H : 8;
 } USBLIB_WByte;
 
-typedef struct
-{
+typedef struct {
     USBLIB_RequestType bmRequestType;
     uint8_t            bRequest;
     USBLIB_WByte       wValue;
     USBLIB_WByte       wIndex;
-    uint16_t            wLength; //uint8_t
+    uint16_t           wLength; //uint8_t
 } USBLIB_SetupPacket;
 
-typedef struct
-{
+typedef struct {
     uint8_t EPn;
     uint8_t Operation;
     uint8_t Data[LOG_DATA_LENGTH];
