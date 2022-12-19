@@ -19,7 +19,7 @@ USBLIB_EPData EpData[EPCOUNT] = {
 
 void USBLIB_Init(void) {
     GPIOA->ODR &= ~GPIO_ODR_ODR12; // DP LOW
-    volatile uint32_t count = 1000000;
+    volatile register uint32_t count = 1000000;
     while(count--) __NOP();
 
     NVIC_DisableIRQ(USB_LP_CAN1_RX0_IRQn);
