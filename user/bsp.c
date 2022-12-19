@@ -28,6 +28,7 @@ static void rcc_reset(void) {
 /*----------------------------------------------------------------------------*/
     RCC->CIR = 0x009F0000;              // Disable all interrupts and clear pending bits
 }
+/******************************************************************************/
 
 /**
  * @brief Static function for configuring flash
@@ -39,12 +40,13 @@ static void flash_config(void) {
     FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
     FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_1;
 }
+/******************************************************************************/
 
 /**
  * @brief Static function for configuring Clock Control Registers group (RCC)
  */
 static void rcc_config(void) {
-/*********************************** 48 MHz ***********************************/
+/*---------------------------------- 48 MHz ----------------------------------*/
     RCC->CR |= ((uint32_t)RCC_CR_HSEON);        // HSE=ON
     while(!(RCC->CR & RCC_CR_HSERDY));
     RCC->CFGR |= RCC_CFGR_PLLMULL6;             // PLLMUL=6;
@@ -70,6 +72,7 @@ static void rcc_config(void) {
     SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH. */
 #endif 
 }
+/******************************************************************************/
 
 /**
  * @brief Static function for configuring General Purpose Input Output
@@ -83,6 +86,7 @@ static void gpio_config(void) {
    GPIOA->CRH |= GPIO_CRH_MODE12_0; //PIN12: output, 10MHz
    GPIOA->CRH &= ~GPIO_CRH_CNF12;   //PIN12: output, push-pull, general
 }
+/******************************************************************************/
 
 /**
  * @brief The function is exported to the startup file.
@@ -93,24 +97,24 @@ void SystemInit (void) {
     rcc_config();
     gpio_config();
 }
-
-
+/********************* Application Programming Interface **********************/
 void bsp_led_off(void) {
     GPIOC->BSRR = GPIO_ODR_ODR13;
 }
-
+/******************************************************************************/
 void bsp_led_on(void) {
     GPIOC->BRR = GPIO_ODR_ODR13;
 }
-
+/******************************************************************************/
 void bsp_led_switch(void) {
     GPIOC->ODR ^= GPIO_ODR_ODR13;
 }
-
+/******************************************************************************/
 void bsp_system_reset(void) {
     __NVIC_SystemReset();
 }
-
+/******************************************************************************/
 void bsp_enable_irq(void) {
     __enable_irq();  /* enable interrupts */
 }
+/******************************************************************************/
