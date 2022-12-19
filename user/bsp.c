@@ -70,7 +70,9 @@ static void rcc_config(void) {
     SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM. */
 #else
     SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH. */
-#endif 
+#endif
+/*----------------------------------------------------------------------------*/
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN + RCC_APB2ENR_IOPCEN + RCC_APB2ENR_AFIOEN;
 }
 /******************************************************************************/
 
@@ -115,6 +117,12 @@ void bsp_system_reset(void) {
 }
 /******************************************************************************/
 void bsp_enable_irq(void) {
-    __enable_irq();  /* enable interrupts */
+    __enable_irq();     /* enable interrupts */
+}
+/******************************************************************************/
+void HardFault_Handler (void) {
+    __disable_irq();    /* disable interrupts */
+    bsp_led_on();
+    while(1);
 }
 /******************************************************************************/
